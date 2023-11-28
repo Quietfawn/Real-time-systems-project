@@ -19,24 +19,6 @@
 #define T_IRQ GPIO_NUM_33
 
 
-spi_bus_config_t config = {
-.mosi_io_num = MOSI,
-.data0_io_num = -1,
-.miso_io_num = MISO,
-.sclk_io_num = SCK,
-.max_transfer_sz = 0,
-};
-
-spi_device_interface_config_t dev_config = {
-    .command_bits = 8,
-    .address_bits = 8,
-    .mode = 0,
-    .clock_source = SPI2_HOST,
-    .spics_io_num = CS,
-
-};
-
-spi_device_handle_t handle;
 
 
 void spi_init (void);
