@@ -25,4 +25,10 @@ void spi_init (void){
 
     ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &config, SPI_DMA_CH_AUTO));
 
+    ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &dev_config, &handle ));
+
+}
+
+void initialize_lcd(void){
+    
 }
