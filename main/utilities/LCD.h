@@ -34,6 +34,9 @@
 #define ENTER_NORMAL_MODE 0x13
 #define ENTER_SLEEP_MODE 0x10
 #define EXIT_SLEEP_MODE 0x11
+#define IDLE_MODE_OFF 0x00
+#define SET_ADDRESS_MODE 0x36
+#define SET_PIXEL_FORMAT 0x3A
 
 //Screen Dimensions, 320x480
 #define COLUMN_MIN 0
@@ -41,10 +44,6 @@
 #define PAGE_MIN 0
 #define PAGE_MAX 0x01DF
 
-
-
-
-void spi_init (void);
-
 void initialize_lcd(void);
+void draw_bitmap(u_int8_t x_begin, u_int8_t y_begin, u_int8_t x_end, u_int8_t y_end, u_int8_t r_value, u_int8_t g_value, u_int8_t b_value);
 

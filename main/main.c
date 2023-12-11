@@ -9,14 +9,12 @@ void app_main(void)
 {
     printf("main\n");
 
-    spi_init();
-    printf("spi innit completed\n");
+    initialize_lcd();
+    vTaskDelay(100);
+    printf("init completed\n");
 
-    while(1){
-
-        initialize_lcd();
-        // printf("lcd init completed\n");
-
-        vTaskDelay(500);
-    }
+    draw_bitmap(0, 0, 10, 10, 0, 0, 0);
+    printf("bitmap drawn\n"); 
+    vTaskDelay(500);
+    
 }
