@@ -28,62 +28,61 @@ spi_device_interface_config_t dev_config = {
 
 spi_device_handle_t handle;
 
-  u_int8_t tx_buffer[] = {SET_DISPLAY_OFF, SET_DISPLAY_ON, ENTER_NORMAL_MODE, 
-  EXIT_SLEEP_MODE, ENTER_SLEEP_MODE, SET_COLUMN_ADDRESS, SET_PAGE_ADDRESS, WRITE_MEMORY_START,SOFT_RESET, SET_PIXEL_FORMAT, SET_ADDRESS_MODE};
+void lcd_cmd(u_int8_t command, u_int8_t parameter[], u_int8_t size){
 
-    spi_transaction_t off = {
+    if(command != NO_CMD){
+    
+    gpio_set_level(DC_RS, GPIO_LEVEL_LOW);
+
+    u_int8_t comd[] = {command};
+
+    spi_transaction_t cmd ={
         .length = 8,
-        .tx_buffer = &tx_buffer[0]
+        .tx_buffer = comd
     };
-    spi_transaction_t on = {
-        .length = 8,
-        .tx_buffer = &tx_buffer[1]
-    };
-    spi_transaction_t normal_mode = {
-        .length = 8,
-        .tx_buffer = &tx_buffer[2]
+    ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &cmd));
+    }
+    
+    if (parameter == NO_CMD_PARAMETER){
+        return;
+    }
+
+    gpio_set_level(DC_RS, GPIO_LEVEL_HIGH);
+
+    spi_transaction_t cmd_param = {
+        .length = 8*size,
+        .tx_buffer = parameter
     };
 
-    spi_transaction_t exit_sleep_mode = {
-        .length = 8,
-        .tx_buffer = &tx_buffer[3]
-    };
-     spi_transaction_t enter_sleep_mode = {
-        .length = 8,
-        .tx_buffer = &tx_buffer[4]
-    };
-    spi_transaction_t set_column = {
-        .length = 8,
-        .tx_buffer = &tx_buffer[5]
-    };
-    spi_transaction_t set_page = {
-        .length = 8,
-        .tx_buffer = &tx_buffer[6]
-    };
-    spi_transaction_t write_start = {
-        .length = 8,
-        .tx_buffer = &tx_buffer[7]
-    };
- spi_transaction_t soft_reset = {
-        .length = 8,
-        .tx_buffer = &tx_buffer[8]
-    };
+    ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &cmd_param));
+
+}
 
 
 void initialize_lcd(void){
 
     printf("spi init func\n");
+
     ESP_ERROR_CHECK(spi_bus_initialize(SPI2_HOST, &config, SPI_DMA_CH_AUTO));
+
     printf("bus init\n");
+
     ESP_ERROR_CHECK(spi_bus_add_device(SPI2_HOST, &dev_config, &handle ));
+
     printf("bus add device\n");
+
     ESP_ERROR_CHECK(gpio_set_direction(DC_RS, GPIO_MODE_OUTPUT));
-    ESP_ERROR_CHECK(gpio_set_level(DC_RS, GPIO_LEVEL_LOW));
-    ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &exit_sleep_mode));
+   
+    lcd_cmd(EXIT_SLEEP_MODE, NO_CMD_PARAMETER, 0);
+
     vTaskDelay(200 / portTICK_PERIOD_MS);
-    ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &normal_mode));
+
+    lcd_cmd(ENTER_NORMAL_MODE, NO_CMD_PARAMETER, 0);
+
     vTaskDelay(200 / portTICK_PERIOD_MS);
+
     printf("normal mode\n");
+
     vTaskDelay(200 / portTICK_PERIOD_MS);
 
 }
@@ -96,26 +95,28 @@ void draw_bitmap(u_int8_t x_begin, u_int8_t y_begin, u_int8_t x_end, u_int8_t y_
 
     //column address set
     u_int8_t column_address[] = {0x00, x_begin, 0x00, x_end - x_begin};
-    ESP_ERROR_CHECK(gpio_set_level(DC_RS, GPIO_LEVEL_LOW));
-    ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &set_column));
-    ESP_ERROR_CHECK(gpio_set_level(DC_RS, GPIO_LEVEL_HIGH));
-    spi_transaction_t column_start = {
-        .length = 4*sizeof(u_int8_t),
-        .tx_buffer = column_address
-    };
-    ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &column_start));
+    // ESP_ERROR_CHECK(gpio_set_level(DC_RS, GPIO_LEVEL_LOW));
+    // ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &set_column));
+    // ESP_ERROR_CHECK(gpio_set_level(DC_RS, GPIO_LEVEL_HIGH));
+    // spi_transaction_t column_start = {
+    //     .length = 4*sizeof(u_int8_t),
+    //     .tx_buffer = column_address
+    // };
+    // ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &column_start));
+    lcd_cmd(SET_COLUMN_ADDRESS, column_address, sizeof(column_address));
     printf("column address sent\n");
 
     //page address set
     u_int8_t page_address[] = {0x00, y_begin, 0x00, y_end - y_begin};
-    ESP_ERROR_CHECK(gpio_set_level(DC_RS, GPIO_LEVEL_LOW));
-    ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &set_page));
-    ESP_ERROR_CHECK(gpio_set_level(DC_RS, GPIO_LEVEL_HIGH));
-    spi_transaction_t page_start = {
-        .length = 4*sizeof(u_int8_t),
-        .tx_buffer = page_address
-    };
-    ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &page_start));
+    // ESP_ERROR_CHECK(gpio_set_level(DC_RS, GPIO_LEVEL_LOW));
+    // ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &set_page));
+    // ESP_ERROR_CHECK(gpio_set_level(DC_RS, GPIO_LEVEL_HIGH));
+    // spi_transaction_t page_start = {
+    //     .length = 4*sizeof(u_int8_t),
+    //     .tx_buffer = page_address
+    // };
+    // ESP_ERROR_CHECK(spi_device_polling_transmit(handle, &page_start));
+    lcd_cmd(SET_PAGE_ADDRESS, page_address, sizeof(page_address));
     printf("page address sent\n");
 
     //write pixel data

@@ -44,6 +44,11 @@
 #define PAGE_MIN 0
 #define PAGE_MAX 0x01DF
 
+//misc
+
+#define NO_CMD_PARAMETER NULL
+#define NO_CMD NULL
+
 void initialize_lcd(void);
 void draw_bitmap(u_int8_t x_begin, u_int8_t y_begin, u_int8_t x_end, u_int8_t y_end, u_int8_t r_value, u_int8_t g_value, u_int8_t b_value);
-
+void lcd_cmd(u_int8_t command, u_int8_t parameter[], u_int8_t length);

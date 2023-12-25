@@ -13,7 +13,7 @@ void app_main(void)
     vTaskDelay(100);
     printf("init completed\n");
 
-    draw_bitmap(0, 0, 10, 10, 0, 0, 0);
+    draw_bitmap(0, 0, 10, 100, 0, 0, 0);
     printf("bitmap drawn\n"); 
     vTaskDelay(500);
     
